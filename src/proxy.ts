@@ -16,7 +16,8 @@ const transformUrl = (event: APIGatewayProxyEvent) => {
 const transformHeaders = (event: APIGatewayProxyEvent) => {
   return {
     // add any custom headers here
-    ...event.headers
+    ...event.headers,
+    Host: process.env.BASE_URL!.replace("https://", "")
   };
 };
 
