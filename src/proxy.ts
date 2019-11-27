@@ -8,7 +8,7 @@ const transformUrl = (event: APIGatewayProxyEvent) => {
     .map(key => `${key}=${event.queryStringParameters[key]}`)
     .join("&");
 
-  return `${process.env.BASE_URL}${event.pathParameters}${
+  return `${process.env.BASE_URL}/${event.pathParameters.any}${
     query ? `?${query}` : undefined
   }`;
 };
