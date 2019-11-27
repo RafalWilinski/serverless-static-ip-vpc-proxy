@@ -4,7 +4,13 @@ import "source-map-support/register";
 import response from "./response";
 
 const transformUrl = (event: APIGatewayProxyEvent) => {
-  return `${process.env.BASE_URL}/${event.path}`;
+  const query = Object.keys(event.queryStringParameters)
+    .map(key => `${key}=${event.queryStringParameters[key]}`)
+    .join("&");
+
+  return `${process.env.BASE_URL}${event.pathParameters}${
+    query ? `?${query}` : undefined
+  }`;
 };
 
 const transformHeaders = (event: APIGatewayProxyEvent) => {
@@ -30,10 +36,12 @@ export const handle: APIGatewayProxyHandler = async (event, _context) => {
     body: event.body
   };
 
-  try {
-    const response = await request(params).promise();
+  console.log("Calling", params);
 
-    return response({ response });
+  try {
+    const payload = await request(params).promise();
+
+    return response({ payload });
   } catch (error) {
     console.log("Error", params, error);
     return response({ error }, 400);

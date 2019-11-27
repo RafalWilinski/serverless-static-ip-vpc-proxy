@@ -38,6 +38,7 @@ functions:
       - http:
           path: /proxy/{any+}
           method: ANY
+          cors: true
 
 resources:
   - ${file(./vpc.yml)}
