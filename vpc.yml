@@ -1,0 +1,98 @@
+Resources:
+  VPCStaticIP:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 11.0.0.0/16
+      Tags:
+        - Key: Name
+          Value: ${self:service}-${self:provider.stage}-vpc
+  SubnetPublic:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: ${self:provider.region}b
+      CidrBlock: 11.0.0.0/24
+      Tags:
+        - Key: Name
+          Value: ${self:service}-${self:provider.stage}-public-subnet
+      VpcId:
+        Ref: VPCStaticIP
+  SubnetPrivate:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: ${self:provider.region}b
+      CidrBlock: 11.0.1.0/24
+      Tags:
+        - Key: Name
+          Value: ${self:service}-${self:provider.stage}-private-subnet
+      VpcId:
+        Ref: VPCStaticIP
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: ${self:service}-${self:provider.stage}-igw
+  VPCGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId:
+        Ref: InternetGateway
+      VpcId:
+        Ref: VPCStaticIP
+  RouteTablePublic:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: VPCStaticIP
+      Tags:
+        - Key: Name
+          Value: ${self:service}-${self:provider.stage}-public-route
+  RoutePublic:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId:
+        Ref: InternetGateway
+      RouteTableId:
+        Ref: RouteTablePublic
+  SubnetRouteTableAssociationPublic:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: RouteTablePublic
+      SubnetId:
+        Ref: SubnetPublic
+  EIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+  NatGateway:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId:
+        Fn::GetAtt: [EIP, AllocationId]
+      SubnetId:
+        Ref: SubnetPublic
+  RouteTablePrivate:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: VPCStaticIP
+      Tags:
+        - Key: Name
+          Value: ${self:service}-${self:provider.stage}-private-route
+  RoutePrivate:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId:
+        Ref: NatGateway
+      RouteTableId:
+        Ref: RouteTablePrivate
+  SubnetRouteTableMainAssociationPrivate:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: RouteTablePrivate
+      SubnetId:
+        Ref: SubnetPrivate

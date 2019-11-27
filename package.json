@@ -1,0 +1,20 @@
+{
+  "name": "serverless-static-ip-vpc-proxy",
+  "version": "0.0.1",
+  "description": "Serverless VPC Proxy",
+  "dependencies": {
+    "request": "2.88.0",
+    "request-promise-native": "1.0.8",
+    "source-map-support": "0.5.10"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "8.10.17",
+    "@types/node": "12.12.14",
+    "@types/request": "2.48.3",
+    "@types/request-promise-native": "1.0.17",
+    "serverless-webpack": "5.2.0",
+    "ts-loader": "5.3.3",
+    "typescript": "3.2.4",
+    "webpack": "4.29.0"
+  }
+}
